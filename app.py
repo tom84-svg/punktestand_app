@@ -1,89 +1,83 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
-# Kartenfolge als Gedankenstütze
-card_pattern = [1,2,3,4,5,5,4,3,2,1]
-current_round = 0
-max_rounds = len(card_pattern)
-beer_count = 0
-final_result = False
-game_started = False  # NEU: Flag, ob das Spiel gestartet wurde
-
-# Spielerverwaltung
+# --- Spiel-Variablen ---
 players = []
 scores = {}
+current_round = 0
+max_rounds = 11  # 1,2,3,4,5,5,4,3,2,1
+card_sequence = [1,2,3,4,5,5,4,3,2,1]
+card_count = 0
+beer_count = 0
+game_started = False
+final_result = False
 
+# --- Routes ---
 @app.route("/", methods=["GET", "POST"])
 def index():
-    global current_round, beer_count, final_result, game_started
+    global players, scores, current_round, card_count, beer_count, game_started, final_result
 
-    # Spieler hinzufügen (nur vor Spielstart)
-    if request.method == "POST" and "add_player" in request.form and not game_started:
-        if len(players) < 8:
-            name = request.form.get("player_name")
-            if name and name not in players:
+    if request.method == "POST":
+        # Spieler hinzufügen (nur vor Spielstart)
+        if "add_player" in request.form and not game_started:
+            name = request.form.get("player_name", "").strip()
+            if name and name not in players and len(players) < 8:
                 players.append(name)
                 scores[name] = 0
-        return redirect("/")
 
-    # Spiel starten Button
-    if request.method == "POST" and "start_game" in request.form and len(players) > 0:
-        game_started = True
-        return redirect("/")
+        # Spiel starten
+        if "start_game" in request.form and len(players) > 0:
+            game_started = True
+            current_round = 0
+            card_count = card_sequence[current_round]
 
-    if not game_started:
-        return render_template("index.html", players=players, game_started=game_started)
-
-    # Punkte aktualisieren
-    if request.method == "POST" and "update_scores" in request.form:
-        for p in players:
-            if p in request.form:
+        # Punkte aktualisieren
+        if "update_scores" in request.form:
+            for player in players:
                 try:
-                    points = int(request.form[p])
-                    scores[p] += points
-                except ValueError:
+                    val = int(request.form.get(player, 0))
+                    scores[player] += val
+                except:
                     pass
-        return redirect("/")
 
-    # Runde abschließen
-    if request.method == "POST" and "new_round" in request.form:
-        current_round += 1
-        if current_round < max_rounds:
-            pass
-        else:
-            final_result = True
-        return redirect("/")
+        # Neue Runde abschließen
+        if "new_round" in request.form and game_started and not final_result:
+            current_round += 1
+            if current_round < len(card_sequence):
+                card_count = card_sequence[current_round]
+            else:
+                card_count = card_sequence[-1]
+                final_result = True
 
-    # Bier zählen
-    if request.method == "POST" and "add_beer" in request.form:
-        beer_count += 1
-        return redirect("/")
+        # Bier zählen
+        if "add_beer" in request.form:
+            beer_count += 1
 
-    # Bier zurücksetzen
-    if request.method == "POST" and "reset_beer" in request.form:
-        beer_count = 0
-        return redirect("/")
+        # Bier zurücksetzen
+        if "reset_beer" in request.form:
+            beer_count = 0
 
-    # Spiel zurücksetzen
-    if request.method == "POST" and "reset_game" in request.form:
-        players.clear()
-        scores.clear()
-        current_round = 0
-        beer_count = 0
-        final_result = False
-        game_started = False
-        return redirect("/")
+        # Spiel zurücksetzen
+        if "reset_game" in request.form:
+            players = []
+            scores = {}
+            current_round = 0
+            card_count = 0
+            beer_count = 0
+            game_started = False
+            final_result = False
 
     return render_template("index.html",
                            players=players,
                            scores=scores,
                            current_round=current_round,
-                           max_rounds=max_rounds,
-                           card_count=card_pattern[current_round] if current_round < max_rounds else 0,
+                           card_count=card_count,
                            beer_count=beer_count,
+                           game_started=game_started,
                            final_result=final_result,
-                           game_started=game_started)
+                           max_rounds=len(card_sequence))
 
+# --- Main ---
 if __name__ == "__main__":
     app.run(debug=True)
