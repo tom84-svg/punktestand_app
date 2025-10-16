@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Endergebnis</title>
+  <style>
+    body { font-family: Arial; margin: 40px; }
+    table { border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+  </style>
+</head>
+<body>
+  <h2>🏆 Endergebnis 🏆</h2>
+  <table>
+    <tr><th>Spieler</th><th>Punkte total</th></tr>
+    {% for p, t in totals.items() %}
+      <tr {% if p == winner %} style="font-weight:bold; background:#e0ffe0"{% endif %}>
+        <td>{{ p }}</td>
+        <td>{{ t }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+  <h3>Gewinner: {{ winner }}</h3>
+  <a href="/">🔁 Neues Spiel</a>
+</body>
+</html>

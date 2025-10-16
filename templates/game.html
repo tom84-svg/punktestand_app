@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Runde {{ round_num }}</title>
+  <style>
+    body { font-family: Arial; margin: 40px; }
+    input { width: 60px; padding: 5px; }
+    button { padding: 8px 15px; margin-top: 10px; }
+    #bier-display { font-size: 18px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Runde {{ round_num }} / {{ total_rounds }}</h2>
+  <p>Karten in dieser Runde: <b>{{ cards }}</b></p>
+
+  <form method="post">
+    {% for p in players %}
+      <label>{{ p }}:</label>
+      <input type="number" name="{{ p }}" required><br>
+    {% endfor %}
+    <button type="submit">Weiter</button>
+  </form>
+
+  <div id="bier-display">
+    Bier-Count: <span id="bier-count">{{ bier }}</span>
+    <button id="bier-button">Bier!</button>
+  </div>
+
+  <script>
+    document.getElementById("bier-button").addEventListener("click", function(){
+      fetch("/bier", {method:"POST"})
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById("bier-count").textContent = data.bier;
+      });
+    });
+  </script>
+
+</body>
+</html>
