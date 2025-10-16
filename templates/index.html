@@ -1,23 +1,79 @@
 <!DOCTYPE html>
-<html lang="de">
+<html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Punktestand – Spieler</title>
-  <style> body{font-family:Arial;margin:20px} input{width:100%;padding:8px;margin:6px 0} button{padding:10px 16px} </style>
+    <title>Punkte-Spiel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; text-align: center; padding-top: 30px; }
+        .card-player { max-width: 400px; margin: 20px auto; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); background-color: #ffffff; }
+        .round-info { font-size: 1.2rem; margin-bottom: 20px; font-weight: 500; }
+        .score { font-size: 2rem; margin: 15px 0; font-weight: bold; }
+        .cards-info { font-size: 1.1rem; margin-bottom: 10px; }
+        .btn-custom { min-width: 150px; margin: 5px; }
+        input[name="player_name"], input[type="number"] { max-width: 150px; margin-bottom: 10px; text-align: center; }
+        .beer-count { font-size: 1.3rem; font-weight: bold; color: #c82333; margin: 15px 0; }
+    </style>
 </head>
 <body>
-  <h1>Punktestand</h1>
-  <p>Spieler eingeben (1–8):</p>
-  <form method="post">
-    {% for i in range(8) %}
-      <input type="text" name="player" placeholder="Spieler {{ i+1 }}">
-    {% endfor %}
-    <br>
-    <button type="submit">Spiel starten</button>
-  </form>
-  {% if error %}
-    <p style="color:red">{{ error }}</p>
-  {% endif %}
+    <h1>🍻 Punkte-Spiel</h1>
+
+    {% if not game_started %}
+        <h3>Spieler hinzufügen (max. 8)</h3>
+        <form method="post">
+            <input type="text" name="player_name" placeholder="Name">
+            <button class="btn btn-secondary btn-custom" type="submit" name="add_player">Hinzufügen</button>
+        </form>
+
+        {% if players|length > 0 %}
+            <h4>Aktuelle Spieler:</h4>
+            <ul>
+                {% for p in players %}
+                    <li>{{ p }}</li>
+                {% endfor %}
+            </ul>
+            <form method="post">
+                <button class="btn btn-success btn-custom" type="submit" name="start_game">Spiel starten</button>
+            </form>
+        {% endif %}
+
+    {% else %}  {# Spiel gestartet #}
+        <div class="round-info">Runde {{ current_round + 1 if current_round < max_rounds else max_rounds }} – Karten: {{ card_count }}</div>
+
+        {% for player in players %}
+            <div class="card-player">
+                <h3>{{ player }}</h3>
+                <div class="score">Punkte: {{ scores[player] }}</div>
+                <form method="post">
+                    <input type="number" name="{{ player }}" placeholder="Neue Punkte">
+                    <div>
+                        <button class="btn btn-primary btn-custom" type="submit" name="update_scores" {% if final_result %}disabled{% endif %}>Punkte aktualisieren</button>
+                    </div>
+                </form>
+            </div>
+        {% endfor %}
+
+        <div class="beer-count">🍺 Bier-Runden: {{ beer_count }}</div>
+
+        <form method="post">
+            <button class="btn btn-success btn-custom" type="submit" name="new_round" {% if final_result %}disabled{% endif %}>✅ Runde abschließen</button>
+            <button class="btn btn-info btn-custom" type="submit" name="add_beer">🍺 Neues Bier gezählt</button>
+            <button class="btn btn-warning btn-custom" type="submit" name="reset_beer">♻️ Bier zurücksetzen</button>
+            <button class="btn btn-danger btn-custom" type="submit" name="reset_game">🛑 Spiel zurücksetzen</button>
+        </form>
+
+        {% if final_result %}
+            <h2 class="mt-4">🎉 Endergebnis</h2>
+            <ul class="list-group" style="max-width: 400px; margin: 0 auto;">
+                {% for player, score in scores.items() %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ player }}
+                        <span class="badge bg-primary rounded-pill">{{ score }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+    {% endif %} {# Ende game_started #}
+
 </body>
 </html>
