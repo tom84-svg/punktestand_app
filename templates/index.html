@@ -1,20 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
   <meta charset="utf-8">
-  <title>Punkte-Spiel</title>
-  <style>
-    body { font-family: Arial; margin: 40px; }
-    input { margin: 5px; padding: 6px; }
-    button { padding: 8px 15px; margin-top: 10px; }
-  </style>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Punktestand – Spieler</title>
+  <style> body{font-family:Arial;margin:20px} input{width:100%;padding:8px;margin:6px 0} button{padding:10px 16px} </style>
 </head>
 <body>
-  <h2>Spieler eingeben (max. 8)</h2>
+  <h1>Punktestand</h1>
+  <p>Spieler eingeben (1–8):</p>
   <form method="post">
     {% for i in range(8) %}
-      <input type="text" name="player" placeholder="Name {{ i+1 }}"><br>
+      <input type="text" name="player" placeholder="Spieler {{ i+1 }}">
     {% endfor %}
+    <br>
     <button type="submit">Spiel starten</button>
   </form>
   {% if error %}

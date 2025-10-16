@@ -1,26 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
   <meta charset="utf-8">
-  <title>Endergebnis</title>
-  <style>
-    body { font-family: Arial; margin: 40px; }
-    table { border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-  </style>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Endstand</title>
+  <style> body{font-family:Arial;margin:18px} table{border-collapse:collapse;width:100%} th,td{border:1px solid #ddd;padding:10px;text-align:left} </style>
 </head>
 <body>
-  <h2>🏆 Endergebnis 🏆</h2>
+  <h1>Endstand</h1>
   <table>
-    <tr><th>Spieler</th><th>Punkte total</th></tr>
-    {% for p, t in totals.items() %}
-      <tr {% if p == winner %} style="font-weight:bold; background:#e0ffe0"{% endif %}>
-        <td>{{ p }}</td>
-        <td>{{ t }}</td>
+    <tr><th>Platz</th><th>Spieler</th><th>Punkte</th></tr>
+    {% for i, (name, pts) in enumerate(totals, start=1) %}
+      <tr {% if i==1 %} style="background:#e8ffe8;font-weight:700" {% endif %}>
+        <td>{{ i }}</td><td>{{ name }}</td><td>{{ pts }}</td>
       </tr>
     {% endfor %}
   </table>
   <h3>Gewinner: {{ winner }}</h3>
-  <a href="/">🔁 Neues Spiel</a>
+  <p>🍺 Bier gesamt: {{ bier }}</p>
+  <p><a href="{{ url_for('index') }}">Neues Spiel</a></p>
 </body>
 </html>

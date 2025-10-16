@@ -1,41 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Runde {{ round_num }}</title>
   <style>
-    body { font-family: Arial; margin: 40px; }
-    input { width: 60px; padding: 5px; }
-    button { padding: 8px 15px; margin-top: 10px; }
-    #bier-display { font-size: 18px; margin-top: 10px; }
+    body{font-family:Arial;margin:14px}
+    .header{display:flex;justify-content:space-between;align-items:center}
+    .cardbox{background:#fff;padding:12px;border-radius:8px;margin:10px 0}
+    input[type=number]{width:80px;padding:8px;margin:6px 0}
+    button{padding:10px 14px;margin:6px}
+    .bier{background:#f39c12;color:#fff;border:none;border-radius:8px;padding:8px 12px}
+    .next{background:#1a73e8;color:#fff;border:none;border-radius:8px;padding:10px 14px}
   </style>
 </head>
 <body>
-  <h2>Runde {{ round_num }} / {{ total_rounds }}</h2>
-  <p>Karten in dieser Runde: <b>{{ cards }}</b></p>
-
-  <form method="post">
-    {% for p in players %}
-      <label>{{ p }}:</label>
-      <input type="number" name="{{ p }}" required><br>
-    {% endfor %}
-    <button type="submit">Weiter</button>
-  </form>
-
-  <div id="bier-display">
-    Bier-Count: <span id="bier-count">{{ bier }}</span>
-    <button id="bier-button">Bier!</button>
+  <div class="header">
+    <div>
+      <h2>Runde {{ round_num }} / {{ total_rounds }}</h2>
+      <div>Karten diese Runde: <strong>{{ cards }}</strong></div>
+    </div>
+    <div>
+      <div>🍺 Bier: <strong>{{ bier }}</strong></div>
+      <form method="post" action="{{ url_for('bier') }}">
+        <button class="bier" type="submit">+1 Bier</button>
+      </form>
+    </div>
   </div>
 
-  <script>
-    document.getElementById("bier-button").addEventListener("click", function(){
-      fetch("/bier", {method:"POST"})
-      .then(response => response.json())
-      .then(data => {
-        document.getElementById("bier-count").textContent = data.bier;
-      });
-    });
-  </script>
+  <div class="cardbox">
+    <form method="post">
+      {% for p in players %}
+        <div>
+          <label style="font-weight:600">{{ p }}</label>
+          <input type="number" name="{{ p }}" value="0" required>
+          <span style="margin-left:12px">Total bisher: {{ totals[p] }}</span>
+        </div>
+      {% endfor %}
+      <div style="margin-top:12px">
+        <button class="next" type="submit">Runde abschliessen</button>
+      </div>
+    </form>
+  </div>
 
+  <div>
+    <a href="{{ url_for('summary') }}">Zwischenstand / Zusammenfassung</a>
+    &nbsp;|&nbsp;
+    <a href="{{ url_for('index') }}">Neues Spiel</a>
+  </div>
 </body>
 </html>
